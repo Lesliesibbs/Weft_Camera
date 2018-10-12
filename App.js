@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, ImageBackground,CameraRoll } from 'react-native';
 import { Camera, Permissions } from 'expo';
 
 export default class App extends React.Component {
@@ -13,37 +13,31 @@ export default class App extends React.Component {
      this.setState({ hasCameraPermission: status === 'granted' });
    }
 
+   takePicture = () => {
+  this.camera.takePictureAsync({
+    quality: 0.1,
+    base64: true,
+    exif: false
+  }).then(photo => {
+    CameraRoll.saveToCameraRoll(photo.uri)
+  })
+}
+
   render() {
+    const { photo } = this.state;
     return (
-      <View style={{ flex: 1 }}>
-          <Camera style={{ flex: 1 }} type={this.state.type}>
-            <View
-              style={{
-                flex: 1,
-                backgroundColor: 'transparent',
-                flexDirection: 'row',
-              }}>
-              <TouchableOpacity
-                style={{
-                  flex: 0.1,
-                  alignSelf: 'flex-end',
-                  alignItems: 'center',
-                }}
-                onPress={() => {
-                  this.setState({
-                    type: this.state.type === Camera.Constants.Type.back
-                      ? Camera.Constants.Type.front
-                      : Camera.Constants.Type.back,
-                  });
-                }}>
-                <Text
-                  style={{ fontSize: 18, marginBottom: 10, color: 'white' }}>
-                  {' '}Flip{' '}
-                </Text>
-              </TouchableOpacity>
-            </View>
-          </Camera>
-        </View>
+      <View style={{ flex: 1, width: '100%' }}>
+        <Camera
+          style={{ flex: 1 }}
+          onPress={this.takePicture}
+          type={Camera.Constants.Type.back}
+          ref={cam => this.camera = cam}>
+          <TouchableOpacity
+            style={{ flex: 1 }}
+            onPress={this.takePicture}/>
+        </Camera>
+      )}
+     </View>
     );
   }
 }
