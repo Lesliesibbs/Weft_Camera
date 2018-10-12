@@ -15,13 +15,24 @@ export default class App extends React.Component {
 
    takePicture = () => {
   this.camera.takePictureAsync({
-    quality: 0.1,
+    quality: 0.5,
     base64: true,
     exif: false
   }).then(photo => {
     CameraRoll.saveToCameraRoll(photo.uri)
   })
 }
+
+
+
+   start() {
+       this.timer = setInterval(() => this.takePicture(),
+                                100);
+   }
+
+   onComponentWillUnmount() {
+       clearInterval(this.timer);
+   }
 
   render() {
     const { photo } = this.state;
@@ -34,7 +45,7 @@ export default class App extends React.Component {
           ref={cam => this.camera = cam}>
           <TouchableOpacity
             style={{ flex: 1 }}
-            onPress={this.takePicture}/>
+            onPress={this.start.bind(this)}/>
         </Camera>
       )}
      </View>
